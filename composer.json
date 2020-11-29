@@ -1,0 +1,23 @@
+{
+    "name": "codenom/midtrans-sample-data",
+    "description": "Sample Data Midtrans Payment Methods for CodeIgniter 4",
+    "type": "codeigniter4-payments",
+    "homepage": "https://github.com/codenomdev/midtrans-sample-data",
+    "license": [
+        "MIT"
+    ],
+    "authors": [
+        {
+            "name": "Ilham Falachul Adha",
+            "email": "codenomdev@gmail.com"
+        }
+    ],
+    "require": {
+        "codenom/midtrans": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Codenom\\MidtransSampleData\\": "src/"
+        }
+    }
+}
