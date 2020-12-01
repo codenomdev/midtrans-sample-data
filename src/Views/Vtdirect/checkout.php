@@ -97,66 +97,121 @@
             <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>
         </div>
         <hr class="mb-4">
-
         <h4 class="mb-3">Payment</h4>
-        <!-- form response from API Midtrans-->
-        <form id="payment-form" method="post" action="<?= route_to('midtrans/snap/finish'); ?>">
-            <input type="hidden" name="result_type" id="result-type" value="">
-            <input type="hidden" name="result_data" id="result-data" value="">
-        </form>
-        <!-- end form response from API Midtrans -->
-        <button class="btn btn-primary btn-lg btn-block" id="pay-button">Pay with SNAP!</button>
+        <!-- form for API Midtrans-->
+        <?= form_open(route_to('midtrans/vtdirect/token'), ['id' => 'payment-form']); ?>
+        <div class="form-group">
+            <label for="CreditCard">Card Number</label>
+            <?= form_input('card_number', '4811111111111114', ['class' => 'form-control card-number', 'id' => 'CreditCard']); ?>
+        </div>
+        <div class="row mb-3">
+            <div class="col-4">
+                <div class="form-group">
+                    <label for="Expiration">Expiration Month</label>
+                    <?= form_input('card_expiry_month', '12', ['class' => 'form-control card-expiry-month', 'id' => 'Expiration']); ?>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label for="Expirationyear">Expiration Year</label>
+                    <?= form_input('card_expiry_year', '2022', ['class' => 'form-control card-expiry-year', 'id' => 'Expirationyear']); ?>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label for="CVV">CVV Code</label>
+                    <?= form_input('card_cvv', '123', ['class' => 'form-control card-cvv', 'id' => 'CVV']); ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="SaveCC" name="save_card">
+                <label class="custom-control-label" for="SaveCC">Save Credit Card</label>
+            </div>
+        </div>
+        <input id="token_id" name="token_id" type="hidden" />
+        <?= form_button(['content' => 'Pay with Credit Card', 'class' => 'btn btn-block btn-primary btn-lg submit-button', 'type' => 'submit']); ?>
+        <?= form_close(); ?>
+        <!-- end form for API Midtrans -->
     </div>
 </div>
 <?= $this->endSection(); ?>
 <?= $this->section('js-assets'); ?>
 <!-- Load javascript from midtrans, mode sandbox -->
-<script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<?= $idMerchant; ?>"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.css" />
+<script type="text/javascript" src="https://api.sandbox.veritrans.co.id/v2/assets/js/veritrans.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+<!-- Javascript for token generation -->
 <script type="text/javascript">
-    $('#pay-button').click(function(event) {
-        event.preventDefault();
-        $(this).attr("disabled", "disabled");
+    // const iframe = document.createElement('iframe');
+    // iframe.setAttribute('allowFullScreen', '');
+    // iframe.setAttribute('allow', 'fullscreen');
+    $(function() {
+        // Sandbox URL
+        Veritrans.url = "https://api.sandbox.veritrans.co.id/v2/token";
+        // TODO: Change with your client key.
+        Veritrans.client_key = "<?= $clientKey; ?>";
+        //Veritrans.client_key = "VT-client-h7ubdjqpcsLAQnjY";
 
-        $.ajax({
-            url: '<?= base_url('midtrans/snap/token') ?>',
-            cache: false,
-
-            success: function(data) {
-                //location = data;
-
-                console.log('token = ' + data);
-
-                var resultType = document.getElementById('result-type');
-                var resultData = document.getElementById('result-data');
-
-                function changeResult(type, data) {
-                    $("#result-type").val(type);
-                    $("#result-data").val(JSON.stringify(data));
-                    //resultType.innerHTML = type;
-                    //resultData.innerHTML = JSON.stringify(data);
-                }
-
-                snap.pay(data, {
-
-                    onSuccess: function(result) {
-                        changeResult('success', result);
-                        console.log(result.status_message);
-                        console.log(result);
-                        $("#payment-form").submit();
-                    },
-                    onPending: function(result) {
-                        changeResult('pending', result);
-                        console.log(result.status_message);
-                        $("#payment-form").submit();
-                    },
-                    onError: function(result) {
-                        changeResult('error', result);
-                        console.log(result.status_message);
-                        $("#payment-form").submit();
-                    }
-                });
+        //Veritrans.client_key = "d4b273bc-201c-42ae-8a35-c9bf48c1152b";
+        var card = function() {
+            return {
+                'card_number': $(".card-number").val(),
+                'card_exp_month': $(".card-expiry-month").val(),
+                'card_exp_year': $(".card-expiry-year").val(),
+                'card_cvv': $(".card-cvv").val(),
+                'secure': true,
+                'bank': 'bni',
+                'gross_amount': 10000
             }
+        };
+
+        function callback(response) {
+            if (response.redirect_url) {
+                // 3dsecure transaction, please open this popup
+                openDialog(response.redirect_url);
+
+            } else if (response.status_code == '200') {
+                // success 3d secure or success normal
+                closeDialog();
+                // submit form
+                $(".submit-button").attr("disabled", "disabled");
+                $("#token_id").val(response.token_id);
+                $("#payment-form").submit();
+            } else {
+                // failed request token
+                console.log('Close Dialog - failed');
+                //closeDialog();
+                //$('#purchase').removeAttr('disabled');
+                // $('#message').show(FADE_DELAY);
+                // $('#message').text(response.status_message);
+                //alert(response.status_message);
+            }
+        }
+
+        function openDialog(url) {
+            $.fancybox.open({
+                href: url,
+                type: 'iframe',
+                autoSize: false,
+                width: 700,
+                height: 500,
+                closeBtn: false,
+                modal: true
+            });
+        }
+
+        function closeDialog() {
+            $.fancybox.close();
+        }
+
+        $('.submit-button').click(function(event) {
+            event.preventDefault();
+            //$(this).attr("disabled", "disabled"); 
+            Veritrans.token(card, callback);
+            return false;
         });
     });
 </script>

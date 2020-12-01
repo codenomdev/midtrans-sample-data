@@ -6,10 +6,8 @@ use CodeIgniter\Controller;
 
 class Snap extends Controller
 {
-    protected $config;
-
-    //load helper
-    protected $helper = ['form'];
+    //load form helper
+    protected $helpers = ['form'];
 
     //render property
     protected $render;
@@ -17,16 +15,19 @@ class Snap extends Controller
     //midtrans property
     protected $midtrans;
 
+    //config property
+    protected $config;
+
     public function __construct()
     {
-        $this->config = config('Midtrans');
         $this->render = \Config\Services::renderer();
         $this->midtrans = service('Midtrans');
+        $this->config = config('Midtrans');
     }
 
     public function index()
     {
-        return $this->render->render('Codenom\MidtransSampleData\Views\Snap\checkout');
+        return $this->render->setData(['idMerchant' => $this->config->idMerchant])->render('Codenom\MidtransSampleData\Views\Snap\checkout');
     }
 
     public function token()
@@ -114,5 +115,12 @@ class Snap extends Controller
 
         //response token
         echo $snapToken->token;
+    }
+
+    public function attemptOrder()
+    {
+        if ($data['response'] = \Codenom\Midtrans\Parse\JSONParse::decodeToObject($this->request->getPost('result_data'))) {
+            return $this->render->setData($data)->render('Codenom\MidtransSampleData\Views\Snap\finish');
+        }
     }
 }
