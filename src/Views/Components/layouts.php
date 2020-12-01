@@ -273,11 +273,11 @@
         <?= $this->renderSection('main'); ?>
         <!-- Footer Main -->
         <footer class="my-5 pt-5 text-muted text-center text-small">
-            <p class="mb-1">&copy; 2017-2018 Company Name</p>
+            <p class="mb-1">&copy; 2019-2020 Codenom Dev</p>
             <ul class="list-inline">
-                <li class="list-inline-item"><a href="#">Privacy</a></li>
-                <li class="list-inline-item"><a href="#">Terms</a></li>
-                <li class="list-inline-item"><a href="#">Support</a></li>
+                <li class="list-inline-item"><a href="https://github.com/codenomdev/midtrans-sample-data">Repository</a></li>
+                <li class="list-inline-item"><a href="https://github.com/codenomdev/midtrans-sample-data/issues">Issue</a></li>
+                <li class="list-inline-item"><a href="https://codenom.com">Support</a></li>
             </ul>
         </footer>
         <!-- End Footer Main -->
