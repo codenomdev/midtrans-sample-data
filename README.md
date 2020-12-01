@@ -4,13 +4,13 @@ Midtrans ❤️ CodeIgniter 4!
 This is the Midtrans Sample Data for CodeIgniter 4.
 
 ### Requirements
-You need the Midtrans library from Codenom, you can see it in the following repository: (Midtrans CodeIgniter 4)[https://github.com/codenomdev/codeigniter4-midtrans].
+You need the Midtrans library from Codenom, you can see it in the following repository: [Midtrans CodeIgniter 4](https://github.com/codenomdev/codeigniter4-midtrans).
 
 ## Installation
 * Use composer ``` composer require codenom/midtrans-sample-data ```
 
 ## Configuration
-The settings you can see in (Configuration)[https://github.com/codenomdev/codeigniter4-midtrans#configuration]
+The settings you can see in [Configuration](https://github.com/codenomdev/codeigniter4-midtrans#configuration)
 
 ## Features
 * Checkout with SNAP: ``` http://<base_url>/midtrans/snap ```
